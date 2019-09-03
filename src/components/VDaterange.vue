@@ -31,19 +31,6 @@
             </v-card-title>
             <v-card-text>
               <div class="v-date-range__content">
-                <v-list v-if="!noPresets" class="mr-4">
-                  <v-subheader>{{ presetLabel }}</v-subheader>
-                  <v-list-item
-                    v-for="(preset, index) in presets"
-                    v-model="isPresetActive[index]"
-                    :key="index"
-                    @click="selectPreset(index)"
-                  >
-                    <v-list-item-content>
-                      {{ preset.label }}
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-list>
                 <v-date-picker
                   class="mr-4 v-date-range__picker--start v-date-range__picker"
                   v-model="pickerStart"
@@ -70,17 +57,30 @@
                   :events="highlightDates"
                   :event-color="highlightClasses"
                 ></v-date-picker>
+                <v-list v-if="!noPresets" class="mr-4">
+                  <v-subheader>{{ presetLabel }}</v-subheader>
+                  <v-list-item
+                    v-for="(preset, index) in presets"
+                    v-model="isPresetActive[index]"
+                    :key="index"
+                    @click="selectPreset(index)"
+                  >
+                    <v-list-item-content>
+                      {{ preset.label }}
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
               </div>
             </v-card-text>
           </div>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text @click="reset">Reset</v-btn>
-          <v-btn text @click="menu = false">Cancel</v-btn>
-          <v-btn @click="applyRange" color="primary" :disabled="!bothSelected"
-            >Apply</v-btn
-          >
+          <v-btn text @click="reset">{{ actionProps.resetButton }}</v-btn>
+          <v-btn text @click="menu = false">{{ actionProps.cancelButton }}</v-btn>
+          <v-btn @click="applyRange" dark color="primary" :disabled="!bothSelected">
+            {{ actionProps.applyButton }}
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-menu>
@@ -193,6 +193,16 @@ export default {
       type: Object,
       default: () => {
         return {};
+      }
+    },
+    actionProps: {
+      type: Object,
+      default:  () => {
+        return {
+          applyButton: 'Aceptar',
+          cancelButton: 'Cancelar',
+          resetButton: 'Restaurar'
+        };
       }
     }
   },
@@ -326,8 +336,8 @@ export default {
   }
 };
 </script>
-<style scoped lang="stylus">
-.v-date-range__input-field >>> input {
+<style lang="scss">
+.v-date-range__input-field input {
   text-align: center;
 }
 
@@ -337,7 +347,7 @@ export default {
 .v-date-range__content {
   display: flex;
 
-  >>> .v-date-picker-table {
+  .v-date-picker-table {
     .v-btn {
       border-radius: 0;
     }
@@ -345,7 +355,7 @@ export default {
 }
 
 /* =====  End of Menu Content  ====== */
-.v-date-range__pickers >>> .v-date-picker-table__events {
+.v-date-range__pickers .v-date-picker-table__events {
   height: 100%;
   width: 100%;
   top: 0;
@@ -355,7 +365,7 @@ export default {
 /* =============================================
 =            Date buttons            =
 ============================================= */
-.v-date-range__pickers >>> .v-date-picker-table table {
+.v-date-range__pickers .v-date-picker-table table {
   width: auto;
   margin: auto;
   border-collapse: collapse;
@@ -383,7 +393,7 @@ export default {
 /* =============================================
 =            Highlighting the even bubble dot            =
 ============================================= */
-.v-date-range__pickers >>> .v-date-range__in-range {
+.v-date-range__pickers .v-date-range__in-range {
   height: 100%;
   width: 100%;
   margin: 0;
