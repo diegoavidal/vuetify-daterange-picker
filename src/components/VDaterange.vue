@@ -31,6 +31,19 @@
             </v-card-title>
             <v-card-text>
               <div class="v-date-range__content">
+                <v-list v-if="!noPresets" class="mr-4">
+                  <v-subheader>{{ presetLabel }}</v-subheader>
+                  <v-list-item
+                    v-for="(preset, index) in presets"
+                    v-model="isPresetActive[index]"
+                    :key="index"
+                    @click="selectPreset(index)"
+                  >
+                    <v-list-item-content>{{
+                      preset.label
+                    }}</v-list-item-content>
+                  </v-list-item>
+                </v-list>
                 <v-date-picker
                   class="mr-4 v-date-range__picker--start v-date-range__picker"
                   v-model="pickerStart"
@@ -57,19 +70,6 @@
                   :events="highlightDates"
                   :event-color="highlightClasses"
                 ></v-date-picker>
-                <v-list v-if="!noPresets" class="mr-4">
-                  <v-subheader>{{ presetLabel }}</v-subheader>
-                  <v-list-item
-                    v-for="(preset, index) in presets"
-                    v-model="isPresetActive[index]"
-                    :key="index"
-                    @click="selectPreset(index)"
-                  >
-                    <v-list-item-content>
-                      {{ preset.label }}
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-list>
               </div>
             </v-card-text>
           </div>
@@ -77,10 +77,16 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="reset">{{ actionProps.resetButton }}</v-btn>
-          <v-btn text @click="menu = false">{{ actionProps.cancelButton }}</v-btn>
-          <v-btn @click="applyRange" dark color="primary" :disabled="!bothSelected">
-            {{ actionProps.applyButton }}
-          </v-btn>
+          <v-btn text @click="menu = false">{{
+            actionProps.cancelButton
+          }}</v-btn>
+          <v-btn
+            @click="applyRange"
+            dark
+            color="primary"
+            :disabled="!bothSelected"
+            >{{ actionProps.applyButton }}</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-menu>
@@ -88,7 +94,7 @@
 </template>
 <script>
 import { format, parse, differenceInCalendarDays, addDays } from 'date-fns';
-const isoFormat = 'YYYY-MM-DD';
+const isoFormat = 'yyyy-MM-dd';
 const defaultDate = format(new Date(), isoFormat);
 
 export default {
@@ -197,11 +203,11 @@ export default {
     },
     actionProps: {
       type: Object,
-      default:  () => {
+      default: () => {
         return {
-          applyButton: 'Aceptar',
-          cancelButton: 'Cancelar',
-          resetButton: 'Restaurar'
+          applyButton: 'Apply',
+          cancelButton: 'Cancel',
+          resetButton: 'Reset'
         };
       }
     }
@@ -277,7 +283,7 @@ export default {
       this.$emit('menu-closed');
     },
     formatDate(date, fmt) {
-      return format(parse(date), fmt);
+      return format(parse(date, 'yyyy-MM-dd', new Date()), fmt);
     },
     highlight() {
       if (!this.bothSelected) {
@@ -285,13 +291,13 @@ export default {
       }
       const dates = [];
       const classes = {};
-      const start = parse(this.pickerStart);
-      const end = parse(this.pickerEnd);
+      const start = parse(this.pickerStart, 'yyyy-MM-dd', new Date());
+      const end = parse(this.pickerEnd, 'yyyy-MM-dd', new Date());
       const diff = Math.abs(differenceInCalendarDays(start, end));
 
       // Loop though all the days in range.
       for (let i = 0; i <= diff; i++) {
-        const date = format(addDays(start, i), isoFormat);
+        const date = format(addDays(start, i), 'yyyy-MM-dd');
         dates.push(date);
         const classesArr = [];
         classesArr.push(`v-date-range__in-range`);
@@ -370,7 +376,8 @@ export default {
   margin: auto;
   border-collapse: collapse;
 
-  & th, & td {
+  & th,
+  & td {
     height: 32px;
     width: 32px;
   }
